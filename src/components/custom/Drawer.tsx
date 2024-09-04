@@ -39,7 +39,7 @@ const Drawer = ({ messages, onShowGuide }: DrawerProps) => {
           <span className="sr-only">History</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left">
+      <SheetContent side="right">
         <SheetHeader className="flex flex-row items-center justify-between mb-4">
           <div className="flex-1 mr-4">
             <Input
