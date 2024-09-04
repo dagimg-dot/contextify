@@ -6,6 +6,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Book, Settings, Send } from "lucide-react";
 import Message from "@/components/custom/Message";
 import StreamingMessage from "@/components/custom/StreamingMessage";
+import Drawer from "@/components/custom/Drawer";
+import UserGuide from "@/components/custom/UserGuide";
 
 export default function MainPage() {
   const [messages, setMessages] = useState([
@@ -18,9 +20,18 @@ export default function MainPage() {
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamedContent, setStreamedContent] = useState("");
+  const [showGuide, setShowGuide] = useState(false);
   const scrollAreaRef = useRef(null);
   const streamIntervalRef = useRef(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const hasVisited = localStorage.getItem("hasVisitedContextDictionary");
+    if (!hasVisited) {
+      setShowGuide(true);
+      localStorage.setItem("hasVisitedContextDictionary", "true");
+    }
+  }, []);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -72,6 +83,7 @@ export default function MainPage() {
             <Settings className="w-5 h-5" />
             <span className="sr-only">Settings</span>
           </Button>
+          <Drawer messages={messages} onShowGuide={() => setShowGuide(true)} />
         </div>
       </header>
       <main className="flex-1 overflow-hidden">
@@ -103,6 +115,7 @@ export default function MainPage() {
           </Button>
         </div>
       </footer>
+      <UserGuide open={showGuide} onOpenChange={setShowGuide} />
     </div>
   );
 }
