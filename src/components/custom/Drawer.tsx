@@ -10,7 +10,7 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Menu, HelpCircle, ChevronLeft } from "lucide-react";
+import { Menu, HelpCircle, ChevronRight } from "lucide-react";
 import { MessageType } from "@/types/types";
 
 interface DrawerProps {
@@ -40,28 +40,31 @@ const Drawer = ({ messages, onShowGuide }: DrawerProps) => {
         </Button>
       </SheetTrigger>
       <SheetContent side="right">
-        <SheetHeader className="flex flex-row items-center justify-between mb-4">
+        <SheetHeader className="flex flex-row items-center justify-between mb-4 space-y-0">
           <div className="flex-1 mr-4">
             <Input
               type="text"
               placeholder="Search history..."
               value={searchHistory}
               onChange={(e) => setSearchHistory(e.target.value)}
-              className="w-full"
+              className="w-full focus:border-none"
             />
           </div>
-          <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" onClick={onShowGuide}>
-              <HelpCircle className="w-5 h-5" />
-              <span className="sr-only">Help</span>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onShowGuide}
+            className="mb-6 mr-2"
+          >
+            <HelpCircle className="w-5 h-5" />
+            <span className="sr-only">Help</span>
+          </Button>
+          <SheetClose asChild>
+            <Button variant="outline" size="icon">
+              <ChevronRight className="w-5 h-5" />
+              <span className="sr-only">Close</span>
             </Button>
-            <SheetClose asChild>
-              <Button variant="ghost" size="icon">
-                <ChevronLeft className="w-5 h-5" />
-                <span className="sr-only">Close</span>
-              </Button>
-            </SheetClose>
-          </div>
+          </SheetClose>
         </SheetHeader>
         <ScrollArea className="h-[calc(100vh-8rem)]">
           {filteredMessages.map((message, index) => (
