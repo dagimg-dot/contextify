@@ -1,12 +1,12 @@
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "@/pages/Home";
-import { Button } from "@/components/ui/button";
 
-function App() {
+export default function App() {
   return (
-    <Home>
-      <Button>Contextify</Button>
-    </Home>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+      </Routes>
+    </Router>
   );
 }
-
-export default App;
