@@ -9,6 +9,7 @@ import StreamingMessage from "@/components/custom/StreamingMessage";
 import Drawer from "@/components/custom/Drawer";
 import UserGuide from "@/components/custom/UserGuide";
 import { MessageType } from "@/types/types";
+import { ThemeToggle } from "@/components/custom/ThemeToggle";
 
 export default function MainPage() {
   const [messages, setMessages] = useState<MessageType[]>([
@@ -77,6 +78,7 @@ export default function MainPage() {
           <h1 className="text-xl font-bold">Contextify</h1>
         </div>
         <div className="flex items-center space-x-2">
+          <ThemeToggle />
           <Button
             variant="ghost"
             size="icon"

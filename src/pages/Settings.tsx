@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft } from "lucide-react";
+import { ThemeToggle } from "@/components/custom/ThemeToggle";
 
 export default function SettingsPage() {
   const [apiKey, setApiKey] = useState("");
@@ -32,7 +33,7 @@ export default function SettingsPage() {
           <span className="sr-only">Back to main</span>
         </Button>
         <h1 className="text-xl font-bold">Settings</h1>
-        <div className="w-5" />
+        <ThemeToggle />
       </header>
       <main className="flex-1 overflow-hidden p-4">
         <Tabs defaultValue="api" className="w-full">
