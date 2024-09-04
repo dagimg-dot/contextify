@@ -11,21 +11,20 @@ import UserGuide from "@/components/custom/UserGuide";
 import { MessageType } from "@/types/types";
 import { ThemeToggle } from "@/components/custom/ThemeToggle";
 
-export default function MainPage() {
+export default function Home() {
   const [messages, setMessages] = useState<MessageType[]>([
     {
       type: "system",
       content:
-        "Welcome to Context Dictionary! Enter a word and its context to get an explanation.",
+        "Welcome to Contextify! Enter a word and its context to get an explanation.",
     },
   ]);
   const [input, setInput] = useState("");
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [streamedContent, setStreamedContent] = useState("");
+  const [currentStreamingContent, setCurrentStreamingContent] = useState<
+    string | null
+  >(null);
   const [showGuide, setShowGuide] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
-  // const streamIntervalRef = useRef(null);
-  const streamIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,24 +39,7 @@ export default function MainPage() {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
-  }, [messages, streamedContent]);
-
-  const simulateStreaming = useCallback((content: string) => {
-    setIsStreaming(true);
-    setStreamedContent("");
-    let index = 0;
-    streamIntervalRef.current = setInterval(() => {
-      if (index < content.length) {
-        setStreamedContent((prev) => prev + content[index]);
-        index++;
-      } else {
-        clearInterval(streamIntervalRef.current as unknown as number);
-        setIsStreaming(false);
-        setMessages((prev) => [...prev, { type: "ai", content }]);
-        setStreamedContent("");
-      }
-    }, 10);
-  }, []);
+  }, [messages, currentStreamingContent]);
 
   const handleSend = useCallback(() => {
     if (input.trim()) {
@@ -65,10 +47,16 @@ export default function MainPage() {
       setMessages((prev) => [...prev, { type: "user", content: userMessage }]);
       setInput("");
       setTimeout(() => {
-        simulateStreaming(`Here's an explanation for "${userMessage}":`);
+        const aiResponse = `Here's an explanation for "${userMessage}". It's a bit long, so I'm going to break it up into multiple parts.`;
+        setCurrentStreamingContent(aiResponse);
       }, 100);
     }
-  }, [input, simulateStreaming]);
+  }, [input]);
+
+  const handleStreamingComplete = useCallback((content: string) => {
+    setMessages((prev) => [...prev, { type: "ai", content }]);
+    setCurrentStreamingContent(null);
+  }, []);
 
   return (
     <div className="flex flex-col h-screen bg-background">
@@ -95,7 +83,13 @@ export default function MainPage() {
           {messages.map((message, index) => (
             <Message key={index} message={message} />
           ))}
-          {isStreaming && <StreamingMessage content={streamedContent} />}
+          {currentStreamingContent && (
+            <StreamingMessage
+              content={currentStreamingContent}
+              speed={10}
+              onComplete={handleStreamingComplete}
+            />
+          )}
         </ScrollArea>
       </main>
       <footer className="p-4 border-t">
@@ -113,7 +107,11 @@ export default function MainPage() {
             className="flex-1"
             rows={1}
           />
-          <Button onClick={handleSend} size="icon" disabled={isStreaming}>
+          <Button
+            onClick={handleSend}
+            size="icon"
+            disabled={!!currentStreamingContent}
+          >
             <Send className="w-4 h-4" />
             <span className="sr-only">Send</span>
           </Button>
