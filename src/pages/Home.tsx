@@ -8,9 +8,10 @@ import Message from "@/components/custom/Message";
 import StreamingMessage from "@/components/custom/StreamingMessage";
 import Drawer from "@/components/custom/Drawer";
 import UserGuide from "@/components/custom/UserGuide";
+import { MessageType } from "@/types/types";
 
 export default function MainPage() {
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<MessageType[]>([
     {
       type: "system",
       content:
@@ -21,8 +22,9 @@ export default function MainPage() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamedContent, setStreamedContent] = useState("");
   const [showGuide, setShowGuide] = useState(false);
-  const scrollAreaRef = useRef(null);
-  const streamIntervalRef = useRef(null);
+  const scrollAreaRef = useRef<HTMLDivElement | null>(null);
+  // const streamIntervalRef = useRef(null);
+  const streamIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,7 +41,7 @@ export default function MainPage() {
     }
   }, [messages, streamedContent]);
 
-  const simulateStreaming = useCallback((content) => {
+  const simulateStreaming = useCallback((content: string) => {
     setIsStreaming(true);
     setStreamedContent("");
     let index = 0;
@@ -48,7 +50,7 @@ export default function MainPage() {
         setStreamedContent((prev) => prev + content[index]);
         index++;
       } else {
-        clearInterval(streamIntervalRef.current);
+        clearInterval(streamIntervalRef.current as unknown as number);
         setIsStreaming(false);
         setMessages((prev) => [...prev, { type: "ai", content }]);
         setStreamedContent("");
@@ -72,7 +74,7 @@ export default function MainPage() {
       <header className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center space-x-2">
           <Book className="w-6 h-6" />
-          <h1 className="text-xl font-bold">Context Dictionary</h1>
+          <h1 className="text-xl font-bold">Contextify</h1>
         </div>
         <div className="flex items-center space-x-2">
           <Button

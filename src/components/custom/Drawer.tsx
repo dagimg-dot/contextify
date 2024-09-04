@@ -11,8 +11,14 @@ import {
 } from "@/components/ui/sheet";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Menu, HelpCircle, ChevronLeft } from "lucide-react";
+import { MessageType } from "@/types/types";
 
-const Drawer = ({ messages, onShowGuide }) => {
+interface DrawerProps {
+  messages: MessageType[];
+  onShowGuide: () => void;
+}
+
+const Drawer = ({ messages, onShowGuide }: DrawerProps) => {
   const [searchHistory, setSearchHistory] = useState("");
 
   const filteredMessages = useMemo(

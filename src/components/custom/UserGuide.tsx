@@ -1,7 +1,12 @@
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
-const UserGuide = ({ open, onOpenChange }) => (
+interface UserGuideProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+const UserGuide = ({ open, onOpenChange }: UserGuideProps) => (
   <Dialog open={open} onOpenChange={onOpenChange}>
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
