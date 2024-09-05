@@ -8,9 +8,9 @@ interface UserGuideProps {
 
 const UserGuide = ({ open, onOpenChange }: UserGuideProps) => (
   <Dialog open={open} onOpenChange={onOpenChange}>
-    <DialogContent className="sm:max-w-[425px]">
+    <DialogContent className="max-w-[400px] rounded-md">
       <DialogHeader>
-        <DialogTitle>Welcome to Context Dictionary!</DialogTitle>
+        <DialogTitle>Welcome to Contextify!</DialogTitle>
         <DialogDescription>
           Here's a quick guide on how to use the app:
         </DialogDescription>
