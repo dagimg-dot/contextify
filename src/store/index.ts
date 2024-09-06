@@ -15,8 +15,10 @@ const useGlobalStore = create<GlobalState>()((set) => ({
   setCurrentStreamingContent: (content: string | null) =>
     set({ currentStreamingContent: content }),
   setIsStreaming: (isStreaming: boolean) => set({ isStreaming }),
-  setCurrentConversationId: (id: number | null) =>
-    set({ currentConversationId: id }),
+  setCurrentConversationId: (id: number | null) => {
+    set({ currentConversationId: id });
+    localStorage.setItem("currentConversationId", id!.toString());
+  },
 }));
 
 export default useGlobalStore;

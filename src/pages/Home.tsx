@@ -8,7 +8,7 @@ import useGlobalStore from "@/store";
 
 export default function Home() {
   const [showGuide, setShowGuide] = useState(false);
-  const { currentConversationId } = useGlobalStore();
+  const { setCurrentConversationId } = useGlobalStore();
 
   useEffect(() => {
     const hasVisited = localStorage.getItem("hasVisitedContextDictionary");
@@ -18,7 +18,10 @@ export default function Home() {
       seedDefaultPrompt();
       seedDefaultConversation();
     }
-  }, []);
+    setCurrentConversationId(
+      Number(localStorage.getItem("currentConversationId"))
+    );
+  }, [setCurrentConversationId]);
 
   return (
     <div className="flex flex-col h-screen bg-background">
