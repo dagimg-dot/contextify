@@ -5,6 +5,7 @@ import StreamingMessage from "@/components/custom/StreamingMessage";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/services/db";
 import useGlobalStore from "@/store";
+import { MessageType } from "@/types/types";
 
 interface ChatProps {
   conversationId: number | null;
@@ -28,6 +29,12 @@ const Chat = ({ conversationId }: ChatProps) => {
     [conversationId]
   );
 
+  const defaultMessage: MessageType = {
+    type: "system",
+    content:
+      "Welcome to Contextify! Enter a word and its context to get an explanation.",
+  };
+
   useEffect(() => {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
@@ -50,6 +57,7 @@ const Chat = ({ conversationId }: ChatProps) => {
   return (
     <main className="flex-1 overflow-hidden">
       <ScrollArea className="h-full p-4" ref={scrollAreaRef}>
+        <Message message={defaultMessage} />
         {messages?.map((message, index) => (
           <Message key={index} message={message} />
         ))}
