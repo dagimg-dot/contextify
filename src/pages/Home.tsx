@@ -10,6 +10,7 @@ import Drawer from "@/components/custom/Drawer";
 import UserGuide from "@/components/custom/UserGuide";
 import { MessageType } from "@/types/types";
 import { ThemeToggle } from "@/components/custom/ThemeToggle";
+import { seedDefaultPrompt } from "@/services/db";
 
 export default function Home() {
   const [messages, setMessages] = useState<MessageType[]>([
@@ -32,6 +33,7 @@ export default function Home() {
     if (!hasVisited) {
       setShowGuide(true);
       localStorage.setItem("hasVisitedContextDictionary", "true");
+      seedDefaultPrompt();
     }
   }, []);
 

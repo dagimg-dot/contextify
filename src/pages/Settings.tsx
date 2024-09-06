@@ -6,22 +6,56 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Check } from "lucide-react";
 import { ThemeToggle } from "@/components/custom/ThemeToggle";
+import { db, type Prompt } from "@/services/db";
+import { useLiveQuery } from "dexie-react-hooks";
+import { toast } from "sonner";
+import useGlobalStore from "@/store";
 
 export default function SettingsPage() {
   const [apiKey, setApiKey] = useState("");
-  const [customPrompt, setCustomPrompt] = useState(
-    "Can you explain the meaning of the word '[insert new word]' in this sentence: '[insert sentence]'? Please summarize the explanation in one paragraph."
-  );
-  const [savedPrompts, setSavedPrompts] = useState([
-    "Can you explain the meaning of the word '[insert new word]' in this sentence: '[insert sentence]'? Please summarize the explanation in one paragraph.",
-  ]);
+  const [customPrompt, setCustomPrompt] = useState("");
   const navigate = useNavigate();
+  const { currentPrompt, updateCurrentPrompt } = useGlobalStore();
 
-  const savePrompt = () => {
-    if (customPrompt && !savedPrompts.includes(customPrompt)) {
-      setSavedPrompts((prev) => [...prev, customPrompt]);
+  const prompts = useLiveQuery(() => db.prompts.toArray());
+
+  const savePrompt = async () => {
+    if (customPrompt.trim()) {
+      try {
+        const newPrompt = {
+          content: customPrompt.trim(),
+          name: `Custom Prompt ${new Date().toLocaleString()}`,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          isDefault: false,
+        };
+
+        const newPromptId = await db.prompts.add(newPrompt);
+
+        if (newPromptId) {
+          updateCurrentPrompt(newPrompt);
+          setCustomPrompt("");
+        }
+      } catch (error) {
+        if ((error as Error).message.includes("uniqueness")) {
+          toast.error("Prompt already exists");
+        }
+      }
+    }
+  };
+
+  const selectPrompt = async (prompt: Prompt) => {
+    updateCurrentPrompt(prompt);
+  };
+
+  const deletePrompt = async (id: number) => {
+    try {
+      await db.prompts.delete(id);
+    } catch (error) {
+      console.error("Failed to delete prompt:", error);
+      toast.error("Failed to delete prompt");
     }
   };
 
@@ -46,7 +80,7 @@ export default function SettingsPage() {
               <CardHeader>
                 <CardTitle>Gemini API Key</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex flex-col gap-4 text-center">
                 <Input
                   type="password"
                   placeholder="Enter your API key"
@@ -54,11 +88,18 @@ export default function SettingsPage() {
                   onChange={(e) => setApiKey(e.target.value)}
                 />
                 <Button
-                  className="mt-4 w-full"
+                  className="w-full"
                   onClick={() => alert("API key saved!")}
                 >
                   Save API Key
                 </Button>
+                <a
+                  href="https://aistudio.google.com/app/apikey"
+                  target="_blank"
+                  className="text-sm text-blue-600"
+                >
+                  Don't have an API key? Get one here!
+                </a>
               </CardContent>
             </Card>
           </TabsContent>
@@ -74,24 +115,68 @@ export default function SettingsPage() {
                   onChange={(e) => setCustomPrompt(e.target.value)}
                   rows={4}
                 />
-                <Button className="mt-4 w-full" onClick={savePrompt}>
+                <Button
+                  className="mt-4 w-full"
+                  onClick={savePrompt}
+                  disabled={customPrompt.trim() === ""}
+                >
                   Save Prompt
                 </Button>
                 <div className="mt-4">
                   <h3 className="font-semibold mb-2">Saved Prompts:</h3>
                   <ScrollArea className="h-[200px]">
-                    {savedPrompts.map((prompt, index) => (
-                      <Card key={index} className="mb-2">
+                    {prompts?.length === 0 && (
+                      <Card className="mb-2">
                         <CardContent className="p-2">
-                          <p className="text-sm">{prompt}</p>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="mt-2"
-                            onClick={() => setCustomPrompt(prompt)}
-                          >
-                            Use
-                          </Button>
+                          <p className="text-sm italic">
+                            You haven't saved any prompts yet.
+                          </p>
+                        </CardContent>
+                      </Card>
+                    )}
+                    {prompts?.length !== 0 && (
+                      <Card className="mb-2">
+                        <CardContent className="p-2">
+                          <p className="text-sm italic">
+                            You have {prompts?.length} saved prompts.
+                          </p>
+                        </CardContent>
+                      </Card>
+                    )}
+                    {prompts?.map((prompt) => (
+                      <Card
+                        key={prompt.id}
+                        className={`mb-2 ${
+                          prompt.id === currentPrompt?.id
+                            ? "border-primary"
+                            : ""
+                        }`}
+                      >
+                        <CardContent className="p-2">
+                          <p className="text-sm">{prompt.content}</p>
+                          <div className="flex justify-between items-center mt-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => selectPrompt(prompt)}
+                            >
+                              Use
+                            </Button>
+                            {prompt.id === currentPrompt?.id && (
+                              <span className="text-primary">
+                                <Check className="w-4 h-4" />
+                              </span>
+                            )}
+                            {!prompt.isDefault && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => deletePrompt(prompt.id!)}
+                              >
+                                Delete
+                              </Button>
+                            )}
+                          </div>
                         </CardContent>
                       </Card>
                     ))}

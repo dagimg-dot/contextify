@@ -1,4 +1,6 @@
+import useGlobalStore from "@/store";
 import Dexie, { type Table } from "dexie";
+import { toast } from "sonner";
 
 interface Conversation {
   id?: number;
@@ -45,12 +47,38 @@ class ContextifyDB extends Dexie {
       conversations: "++id, title, createdAt, updatedAt, lastMessagePreview",
       messages: "++id, conversationId, type, timestamp, content",
       dictionaryEntries: "word, lastQueried",
-      prompts: "++id, name, createdAt, updatedAt, isDefault",
+      prompts: "++id, &name, &content, createdAt, updatedAt, isDefault",
     });
   }
 }
 
 const db = new ContextifyDB();
 
+const seedDefaultPrompt = async () => {
+  try {
+    const existingDefaultPrompt = await db.prompts
+      .where("isDefault")
+      .equals("true")
+      .first();
+
+    if (!existingDefaultPrompt) {
+      const defaultPrompt = {
+        content:
+          "Can you explain the meaning of the word '[insert new word]' in this sentence: '[insert sentence]'? Please summarize the explanation in one paragraph.",
+        name: "Default Prompt",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        isDefault: true,
+      };
+      await db.prompts.add(defaultPrompt);
+      useGlobalStore.setState({ currentPrompt: defaultPrompt });
+    }
+  } catch (error) {
+    if (!(error instanceof Dexie.ConstraintError)) {
+      toast.error("Failed to add default prompt");
+    }
+  }
+};
+
 export type { Conversation, Message, DictionaryEntry, Prompt };
-export { db };
+export { db, seedDefaultPrompt };
