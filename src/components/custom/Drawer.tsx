@@ -11,10 +11,11 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import { Menu, HelpCircle, Plus, ChevronRight } from "lucide-react";
+import { Menu, HelpCircle, Plus, ChevronRight, Trash2 } from "lucide-react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, Conversation } from "@/services/db";
 import useGlobalStore from "@/store";
+import { toast } from "sonner";
 
 interface HistoryDrawerProps {
   onShowGuide: () => void;
@@ -44,6 +45,12 @@ const HistoryDrawer: React.FC<HistoryDrawerProps> = ({ onShowGuide }) => {
 
   const selectConversation = (conversation: Conversation) => {
     setCurrentConversationId(conversation.id!);
+  };
+
+  const deleteConversation = async (id: number) => {
+    await db.conversations.delete(id);
+
+    toast.success("Conversation deleted successfully");
   };
 
   return (
@@ -91,15 +98,16 @@ const HistoryDrawer: React.FC<HistoryDrawerProps> = ({ onShowGuide }) => {
           {filteredConversations?.map((conversation) => (
             <Card
               key={conversation.id}
-              className="mb-2 cursor-pointer hover:bg-accent"
+              className="mb-2 cursor-pointer hover:bg-accent flex justify-between items-center pr-6"
               onClick={() => selectConversation(conversation)}
             >
               <CardHeader className="py-2">
                 <CardTitle className="text-sm">{conversation.title}</CardTitle>
                 <p className="text-xs text-muted-foreground">
-                  {conversation.lastMessagePreview}
+                  {conversation.createdAt.toUTCString().replace("GMT", "")}
                 </p>
               </CardHeader>
+              <Trash2 onClick={() => deleteConversation(conversation.id!)} />
             </Card>
           ))}
         </ScrollArea>
