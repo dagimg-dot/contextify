@@ -5,16 +5,17 @@ import { Send } from "lucide-react";
 import { db } from "@/services/db";
 import useGlobalStore from "@/store";
 import { toast } from "sonner";
+import { mergeInput } from "@/utils/inputMerger";
 
-interface InputAreaProps {
-  conversationId: number | null;
-}
-
-const InputArea = ({ conversationId }: InputAreaProps) => {
+const InputArea = () => {
   const [input, setInput] = useState("");
   const textareaRef: React.RefObject<HTMLTextAreaElement> = useRef(null);
-  const { isStreaming, setCurrentStreamingContent, setIsStreaming } =
-    useGlobalStore();
+  const {
+    currentConversationId: conversationId,
+    isStreaming,
+    setCurrentStreamingContent,
+    setIsStreaming,
+  } = useGlobalStore();
 
   const adjustHeight = () => {
     if (textareaRef.current) {
@@ -27,6 +28,26 @@ const InputArea = ({ conversationId }: InputAreaProps) => {
     adjustHeight();
   }, [input]);
 
+  const updateConversationTitle = useCallback(
+    async (userMessage: string) => {
+      const newTitle =
+        userMessage.trim().length > 20
+          ? userMessage.slice(0, 20).concat("...")
+          : userMessage;
+
+      const conversation = await db.conversations
+        .where("id")
+        .equals(conversationId!)
+        .first();
+      if (conversationId && conversation?.title === "New Conversation") {
+        await db.conversations.update(conversationId, {
+          title: newTitle,
+        });
+      }
+    },
+    [conversationId]
+  );
+
   const handleSend = useCallback(async () => {
     if (input.trim()) {
       if (!conversationId) {
@@ -35,6 +56,10 @@ const InputArea = ({ conversationId }: InputAreaProps) => {
       }
 
       const userMessage = input.trim();
+      updateConversationTitle(userMessage);
+
+      const finalPrompt = await mergeInput(userMessage);
+
       await db.messages.add({
         conversationId,
         content: userMessage,
@@ -46,11 +71,17 @@ const InputArea = ({ conversationId }: InputAreaProps) => {
 
       // Simulate AI response
       setTimeout(() => {
-        const aiResponse = `Here's an explanation for "${userMessage}". It's a bit long, so I'm going to break it up into multiple parts.`;
+        const aiResponse = finalPrompt;
         setCurrentStreamingContent(aiResponse);
       }, 1000);
     }
-  }, [input, conversationId, setCurrentStreamingContent, setIsStreaming]);
+  }, [
+    input,
+    conversationId,
+    setCurrentStreamingContent,
+    setIsStreaming,
+    updateConversationTitle,
+  ]);
 
   return (
     <footer className="p-4 border-t">
