@@ -14,7 +14,7 @@ import { Menu, HelpCircle, ChevronRight } from "lucide-react";
 import { MessageType } from "@/types/types";
 
 interface DrawerProps {
-  messages: MessageType[];
+  messages?: MessageType[];
   onShowGuide: () => void;
 }
 
@@ -23,7 +23,7 @@ const Drawer = ({ messages, onShowGuide }: DrawerProps) => {
 
   const filteredMessages = useMemo(
     () =>
-      messages.filter(
+      messages?.filter(
         (m) =>
           m.type === "user" &&
           m.content.toLowerCase().includes(searchHistory.toLowerCase())
@@ -67,7 +67,7 @@ const Drawer = ({ messages, onShowGuide }: DrawerProps) => {
           </SheetClose>
         </SheetHeader>
         <ScrollArea className="h-[calc(100vh-8rem)]">
-          {filteredMessages.map((message, index) => (
+          {filteredMessages?.map((message, index) => (
             <Card key={index} className="mb-2">
               <CardHeader className="py-2">
                 <CardTitle className="text-sm">{message.content}</CardTitle>

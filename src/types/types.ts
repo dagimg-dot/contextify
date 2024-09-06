@@ -7,5 +7,9 @@ export type MessageType = {
 
 export interface GlobalState {
   currentPrompt: Prompt | null;
+  currentStreamingContent: string | null;
+  isStreaming: boolean;
+  setCurrentStreamingContent: (content: string | null) => void;
+  setIsStreaming: (isStreaming: boolean) => void;
   updateCurrentPrompt: (prompt: Prompt) => void;
 }
