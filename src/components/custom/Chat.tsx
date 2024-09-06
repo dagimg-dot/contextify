@@ -7,13 +7,10 @@ import { db } from "@/services/db";
 import useGlobalStore from "@/store";
 import { MessageType } from "@/types/types";
 
-interface ChatProps {
-  conversationId: number | null;
-}
-
-const Chat = ({ conversationId }: ChatProps) => {
+const Chat = () => {
   const scrollAreaRef = useRef<HTMLDivElement | null>(null);
   const {
+    currentConversationId: conversationId,
     currentStreamingContent,
     isStreaming,
     setCurrentStreamingContent,
