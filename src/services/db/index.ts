@@ -80,5 +80,28 @@ const seedDefaultPrompt = async () => {
   }
 };
 
+const seedDefaultConversation = async () => {
+  try {
+    const existingDefaultConversation = await db.conversations
+      .where("title")
+      .equals("New Conversation")
+      .first();
+
+    if (!existingDefaultConversation) {
+      const defaultConversation = await db.conversations.add({
+        title: "New Conversation",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        lastMessagePreview: "Welcome to Contextify!",
+      });
+      useGlobalStore.setState({ currentConversationId: defaultConversation });
+    }
+  } catch (error) {
+    if (!(error instanceof Dexie.ConstraintError)) {
+      toast.error("Failed to add default conversation");
+    }
+  }
+};
+
 export type { Conversation, Message, DictionaryEntry, Prompt };
-export { db, seedDefaultPrompt };
+export { db, seedDefaultPrompt, seedDefaultConversation };
