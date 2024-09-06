@@ -33,6 +33,7 @@ interface Prompt {
   createdAt: Date;
   updatedAt: Date;
   isDefault: boolean;
+  isCurrent: 0 | 1;
 }
 
 class ContextifyDB extends Dexie {
@@ -47,7 +48,8 @@ class ContextifyDB extends Dexie {
       conversations: "++id, title, createdAt, updatedAt, lastMessagePreview",
       messages: "++id, conversationId, type, timestamp, content",
       dictionaryEntries: "word, lastQueried",
-      prompts: "++id, &name, &content, createdAt, updatedAt, isDefault",
+      prompts:
+        "++id, &name, &content, createdAt, updatedAt, isDefault, isCurrent",
     });
   }
 }
@@ -69,9 +71,9 @@ const seedDefaultPrompt = async () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         isDefault: true,
+        isCurrent: 1 as const,
       };
       await db.prompts.add(defaultPrompt);
-      useGlobalStore.setState({ currentPrompt: defaultPrompt });
     }
   } catch (error) {
     if (!(error instanceof Dexie.ConstraintError)) {

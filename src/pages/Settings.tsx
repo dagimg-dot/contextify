@@ -2,62 +2,15 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, Check } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { ThemeToggle } from "@/components/custom/ThemeToggle";
-import { db, type Prompt } from "@/services/db";
-import { useLiveQuery } from "dexie-react-hooks";
-import { toast } from "sonner";
-import useGlobalStore from "@/store";
+import Prompts from "@/components/custom/Prompts";
 
 export default function SettingsPage() {
   const [apiKey, setApiKey] = useState("");
-  const [customPrompt, setCustomPrompt] = useState("");
   const navigate = useNavigate();
-  const { currentPrompt, updateCurrentPrompt } = useGlobalStore();
-
-  const prompts = useLiveQuery(() => db.prompts.toArray());
-
-  const savePrompt = async () => {
-    if (customPrompt.trim()) {
-      try {
-        const newPrompt = {
-          content: customPrompt.trim(),
-          name: `Custom Prompt ${new Date().toLocaleString()}`,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          isDefault: false,
-        };
-
-        const newPromptId = await db.prompts.add(newPrompt);
-
-        if (newPromptId) {
-          updateCurrentPrompt(newPrompt);
-          setCustomPrompt("");
-        }
-      } catch (error) {
-        if ((error as Error).message.includes("uniqueness")) {
-          toast.error("Prompt already exists");
-        }
-      }
-    }
-  };
-
-  const selectPrompt = async (prompt: Prompt) => {
-    updateCurrentPrompt(prompt);
-  };
-
-  const deletePrompt = async (id: number) => {
-    try {
-      await db.prompts.delete(id);
-    } catch (error) {
-      console.error("Failed to delete prompt:", error);
-      toast.error("Failed to delete prompt");
-    }
-  };
 
   return (
     <div className="flex flex-col h-screen bg-background">
@@ -104,86 +57,7 @@ export default function SettingsPage() {
             </Card>
           </TabsContent>
           <TabsContent value="prompts">
-            <Card>
-              <CardHeader>
-                <CardTitle>Custom Prompts</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Textarea
-                  placeholder="Enter your custom prompt..."
-                  value={customPrompt}
-                  onChange={(e) => setCustomPrompt(e.target.value)}
-                  rows={4}
-                />
-                <Button
-                  className="mt-4 w-full"
-                  onClick={savePrompt}
-                  disabled={customPrompt.trim() === ""}
-                >
-                  Save Prompt
-                </Button>
-                <div className="mt-4">
-                  <h3 className="font-semibold mb-2">Saved Prompts:</h3>
-                  <ScrollArea className="h-[200px]">
-                    {prompts?.length === 0 && (
-                      <Card className="mb-2">
-                        <CardContent className="p-2">
-                          <p className="text-sm italic">
-                            You haven't saved any prompts yet.
-                          </p>
-                        </CardContent>
-                      </Card>
-                    )}
-                    {prompts?.length !== 0 && (
-                      <Card className="mb-2">
-                        <CardContent className="p-2">
-                          <p className="text-sm italic">
-                            You have {prompts?.length} saved prompts.
-                          </p>
-                        </CardContent>
-                      </Card>
-                    )}
-                    {prompts?.map((prompt) => (
-                      <Card
-                        key={prompt.id}
-                        className={`mb-2 ${
-                          prompt.id === currentPrompt?.id
-                            ? "border-primary"
-                            : ""
-                        }`}
-                      >
-                        <CardContent className="p-2">
-                          <p className="text-sm">{prompt.content}</p>
-                          <div className="flex justify-between items-center mt-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => selectPrompt(prompt)}
-                            >
-                              Use
-                            </Button>
-                            {prompt.id === currentPrompt?.id && (
-                              <span className="text-primary">
-                                <Check className="w-4 h-4" />
-                              </span>
-                            )}
-                            {!prompt.isDefault && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => deletePrompt(prompt.id!)}
-                              >
-                                Delete
-                              </Button>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </ScrollArea>
-                </div>
-              </CardContent>
-            </Card>
+            <Prompts />
           </TabsContent>
         </Tabs>
       </main>
