@@ -13,6 +13,7 @@ const Chat = () => {
     currentConversationId: conversationId,
     currentStreamingContent,
     isStreaming,
+    isLoading,
     setCurrentStreamingContent,
     setIsStreaming,
   } = useGlobalStore();
@@ -30,6 +31,11 @@ const Chat = () => {
     type: "system",
     content:
       "Welcome to Contextify! Enter a word and its context to get an explanation.",
+  };
+
+  const loadingMessage: MessageType = {
+    type: "system",
+    content: "Loading...",
   };
 
   useEffect(() => {
@@ -58,6 +64,7 @@ const Chat = () => {
         {messages?.map((message, index) => (
           <Message key={index} message={message} />
         ))}
+        {isLoading && <Message message={loadingMessage} />}
         {isStreaming && currentStreamingContent && (
           <StreamingMessage
             content={currentStreamingContent}

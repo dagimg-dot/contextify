@@ -5,8 +5,10 @@ export type MessageType = {
 
 export interface GlobalState {
   currentStreamingContent: string | null;
-  isStreaming: boolean;
+  isStreaming: boolean; 
+  isLoading: boolean;
   currentConversationId: number | null;
+  setIsLoading: (isLoading: boolean) => void;
   setCurrentConversationId: (id: number | null) => void;
   setCurrentStreamingContent: (content: string | null) => void;
   setIsStreaming: (isStreaming: boolean) => void;
