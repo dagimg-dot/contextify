@@ -24,7 +24,7 @@ export default function Home() {
   }, [setCurrentConversationId]);
 
   return (
-    <div className="flex flex-col h-screen bg-background">
+    <div className="flex flex-col h-dvh bg-background">
       <Header onShowGuide={() => setShowGuide(true)} />
       <Chat />
       <InputArea />
