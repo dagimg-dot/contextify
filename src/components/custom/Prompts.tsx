@@ -33,6 +33,8 @@ const Prompts = () => {
           if (newPromptId) {
             selectPrompt(newPrompt);
             setCustomPrompt("");
+
+            toast.success("The prompt has been successfully saved.");
           }
         });
       } catch (error) {
@@ -63,6 +65,8 @@ const Prompts = () => {
       if (prompts?.length == 2) {
         selectPrompt(prompts[0]);
       }
+
+      toast.success("The prompt has been successfully deleted.");
     } catch (error) {
       toast.error("Failed to delete prompt");
     }
