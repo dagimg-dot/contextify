@@ -8,13 +8,13 @@ import { toast } from "sonner";
 import { mergeInput } from "@/utils/inputMerger";
 import { useAIQuery } from "@/services/api/useAPIQuery";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import PromptPreview from "./PromptPreview";
 
 const InputArea = () => {
   const [input, setInput] = useState("");
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [finalPrompt, setFinalPrompt] = useState("");
-  const { data, error, refetch } = useAIQuery(finalPrompt);
+  const { refetch } = useAIQuery(finalPrompt);
   const textareaRef: React.RefObject<HTMLTextAreaElement> = useRef(null);
   const {
     currentConversationId: conversationId,
@@ -37,20 +37,6 @@ const InputArea = () => {
   };
 
   useEffect(() => {
-    if (data) {
-      setCurrentStreamingContent(data);
-      console.log("data", data);
-    }
-  }, [data, setCurrentStreamingContent]);
-
-  useEffect(() => {
-    if (error) {
-      console.error("Error:", error);
-      toast.error(`Error: ${error.message}`);
-    }
-  }, [error]);
-
-  useEffect(() => {
     adjustHeight();
     const getFinalPrompt = async () => {
       if (input.trim()) {
@@ -62,6 +48,33 @@ const InputArea = () => {
     };
     getFinalPrompt();
   }, [input]);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const handleFocus = () => {
+      console.log("handle focus called");
+      setIsPreviewing(true);
+    };
+
+    const handleBlur = () => {
+      setTimeout(() => {
+        if (!textarea.contains(document.activeElement)) {
+          console.log("handle blur called");
+          setIsPreviewing(false);
+        }
+      }, 0);
+    };
+
+    textarea.addEventListener("focus", handleFocus);
+    textarea.addEventListener("blur", handleBlur);
+
+    return () => {
+      textarea.removeEventListener("focus", handleFocus);
+      textarea.removeEventListener("blur", handleBlur);
+    };
+  }, []);
 
   const updateConversationTitle = useCallback(
     async (userMessage: string) => {
@@ -102,6 +115,7 @@ const InputArea = () => {
       setInput("");
       setIsStreaming(true);
       setIsLoading(true);
+      setIsPreviewing(false);
 
       const result = await refetch();
 
@@ -126,52 +140,28 @@ const InputArea = () => {
     setIsLoading,
   ]);
 
-  useEffect(() => {
-    if (input.trim() !== "") {
-      setIsPreviewing(true);
-      textareaRef.current?.focus();
-    } else {
-      setIsPreviewing(false);
-    }
-  }, [input]);
-
   return (
     <footer className="p-4 border-t">
       <div className="relative flex items-center">
-        <Popover open={isPreviewing}>
-          <PopoverTrigger asChild>
-            <div className="w-full">
-              <Textarea
-                ref={textareaRef}
-                placeholder={
-                  messages?.length > 0
-                    ? "Ask a follow-up question..."
-                    : "Enter a word and its context..."
-                }
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSend();
-                  }
-                }}
-                className="flex-1 min-h-[10px] h-[40px] max-h-60 transition-all duration-200 overflow-hidden pr-12"
-              />
-            </div>
-          </PopoverTrigger>
-          <PopoverContent className="w-80 mb-4" side="top">
-            <div className="space-y-2">
-              <h4 className="font-medium leading-none">Preview</h4>
-              <p className="text-sm text-muted-foreground">
-                Here's how your input will be transformed into a prompt:
-              </p>
-              <div className="border p-2 rounded-md">
-                <p className="text-sm">{finalPrompt}</p>
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
+        <PromptPreview finalPrompt={finalPrompt} isPreviewing={isPreviewing}>
+          <Textarea
+            ref={textareaRef}
+            placeholder={
+              messages?.length ?? 0 > 0
+                ? "Ask a follow-up question..."
+                : "Enter a word and its context..."
+            }
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+            className="flex-1 min-h-[10px] h-[40px] max-h-60 transition-all duration-200 overflow-hidden pr-12"
+          />
+        </PromptPreview>
         <div className="absolute right-2 bottom-2 flex space-x-2">
           <Button
             onClick={handleSend}

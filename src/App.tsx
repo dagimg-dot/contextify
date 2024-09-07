@@ -17,7 +17,7 @@ export default function App() {
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </Router>
-        <Toaster duration={1000} />
+        <Toaster duration={1500} />
       </ThemeProvider>
     </QueryClientProvider>
   );
