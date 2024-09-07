@@ -13,11 +13,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useAIQuery } from "@/services/api/useAPIQuery";
 
 const InputArea = () => {
   const [input, setInput] = useState("");
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [finalPrompt, setFinalPrompt] = useState("");
+  const { data, isLoading, error } = useAIQuery(finalPrompt);
   const textareaRef: React.RefObject<HTMLTextAreaElement> = useRef(null);
   const {
     currentConversationId: conversationId,
@@ -85,11 +87,23 @@ const InputArea = () => {
       setInput("");
       setIsStreaming(true);
 
-      // Simulate AI response
-      setTimeout(() => {
-        const aiResponse = finalPrompt;
-        setCurrentStreamingContent(aiResponse);
-      }, 1000);
+      // // Simulate AI response
+      // setTimeout(() => {
+      //   const aiResponse = finalPrompt;
+      //   setCurrentStreamingContent(aiResponse);
+      // }, 1000);
+
+      if (data) {
+        setCurrentStreamingContent(data);
+      }
+
+      if (error) {
+        toast.error("Error: " + error);
+      }
+
+      if (isLoading) {
+        toast.loading("Loading...");
+      }
     }
   }, [
     input,
@@ -97,7 +111,9 @@ const InputArea = () => {
     setCurrentStreamingContent,
     setIsStreaming,
     updateConversationTitle,
-    finalPrompt,
+    data,
+    error,
+    isLoading,
   ]);
 
   const handlePreview = useCallback(() => {
@@ -131,7 +147,11 @@ const InputArea = () => {
               <Eye className="w-4 h-4" />{" "}
               <span className="sr-only">Preview</span>
             </Button>
-            <Button onClick={handleSend} size="icon" disabled={isStreaming}>
+            <Button
+              onClick={handleSend}
+              size="icon"
+              disabled={isStreaming || input.trim() === ""}
+            >
               <Send className="w-4 h-4" />
               <span className="sr-only">Send</span>
             </Button>

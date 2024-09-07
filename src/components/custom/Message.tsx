@@ -16,9 +16,7 @@ const Message = React.memo(({ message }: MessageProps) => (
       className={`max-w-[80%] ${message.type === "system" ? "bg-muted" : ""}`}
     >
       <CardContent className="p-3">
-        <p className={message.type === "user" ? "text-right" : "text-left"}>
-          {message.content}
-        </p>
+        <p className="text-left">{message.content}</p>
       </CardContent>
     </Card>
   </div>
