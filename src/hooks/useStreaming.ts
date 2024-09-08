@@ -11,11 +11,11 @@ export function useStreaming(
 
   const startStreaming = useCallback(() => {
     setIsStreaming(true);
-    setStreamedContent("");
+    setStreamedContent(" ");
     let index = -1;
 
     streamIntervalRef.current = setInterval(() => {
-      if (index < content.length - 1) {
+      if (index < content.length) {
         setStreamedContent((prev) => prev + content[index]);
         index++;
       } else {

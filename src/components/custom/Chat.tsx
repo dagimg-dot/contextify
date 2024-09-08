@@ -68,7 +68,7 @@ const Chat = () => {
         {isStreaming && currentStreamingContent && (
           <StreamingMessage
             content={currentStreamingContent}
-            speed={10}
+            speed={15}
             onComplete={handleStreamingComplete}
           />
         )}

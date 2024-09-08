@@ -6,7 +6,7 @@ import { db } from "@/services/db";
 import useGlobalStore from "@/store";
 import { toast } from "sonner";
 import { mergeInput } from "@/utils/inputMerger";
-import { useAIQuery } from "@/services/api/useAPIQuery";
+import { getAIResponse } from "@/services/api";
 import { useLiveQuery } from "dexie-react-hooks";
 import PromptPreview from "./PromptPreview";
 
@@ -14,13 +14,14 @@ const InputArea = () => {
   const [input, setInput] = useState("");
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [finalPrompt, setFinalPrompt] = useState("");
-  const { refetch } = useAIQuery(finalPrompt);
-  const textareaRef: React.RefObject<HTMLTextAreaElement> = useRef(null);
+  // const [isLoading, setIsLoading] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const {
     currentConversationId: conversationId,
     isStreaming,
     setCurrentStreamingContent,
     setIsStreaming,
+    isLoading,
     setIsLoading,
   } = useGlobalStore();
 
@@ -54,14 +55,12 @@ const InputArea = () => {
     if (!textarea) return;
 
     const handleFocus = () => {
-      console.log("handle focus called");
       setIsPreviewing(true);
     };
 
     const handleBlur = () => {
       setTimeout(() => {
         if (!textarea.contains(document.activeElement)) {
-          console.log("handle blur called");
           setIsPreviewing(false);
         }
       }, 0);
@@ -105,7 +104,6 @@ const InputArea = () => {
 
       const userMessage = input.trim();
       updateConversationTitle(userMessage);
-
       await db.messages.add({
         conversationId,
         content: userMessage,
@@ -113,31 +111,26 @@ const InputArea = () => {
         timestamp: new Date(),
       });
       setInput("");
-      setIsStreaming(true);
       setIsLoading(true);
       setIsPreviewing(false);
 
-      const result = await refetch();
-
-      if (result.data) {
-        setCurrentStreamingContent(result.data);
-        console.log("data", result.data);
+      try {
+        const response = await getAIResponse(finalPrompt);
+        setIsStreaming(true);
+        setCurrentStreamingContent(response);
+      } catch (error) {
+        toast.error("Error: " + (error as Error).message);
+      } finally {
+        setIsLoading(false);
       }
-
-      if (result.error) {
-        toast.error("Error: " + result.error);
-      }
-
-      setIsLoading(false);
     }
   }, [
     input,
     conversationId,
+    finalPrompt,
     setCurrentStreamingContent,
     setIsStreaming,
     updateConversationTitle,
-    refetch,
-    setIsLoading,
   ]);
 
   return (
@@ -166,7 +159,7 @@ const InputArea = () => {
           <Button
             onClick={handleSend}
             size="icon"
-            disabled={isStreaming || input.trim() === ""}
+            disabled={isLoading || isStreaming || input.trim() === ""}
           >
             <Send className="w-4 h-4" />
             <span className="sr-only">Send</span>
