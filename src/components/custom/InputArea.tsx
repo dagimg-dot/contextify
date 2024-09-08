@@ -77,10 +77,11 @@ const InputArea = () => {
 
   const updateConversationTitle = useCallback(
     async (userMessage: string) => {
-      const newTitle =
-        userMessage.trim().length > 20
-          ? userMessage.slice(0, 20).concat("...")
-          : userMessage;
+      // const newTitle =
+      //   userMessage.trim().length > 20
+      //     ? userMessage.slice(0, 20).concat("...")
+      //     : userMessage;
+      const newTitle = userMessage;
 
       const conversation = await db.conversations
         .where("id")

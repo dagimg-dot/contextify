@@ -159,7 +159,9 @@ const HistoryDrawer: React.FC<HistoryDrawerProps> = ({ onShowGuide }) => {
                     className="flex-1"
                   >
                     <CardTitle className="text-sm">
-                      {conversation.title}
+                      {conversation.title.length > 20
+                        ? conversation.title.slice(0, 20).concat("...")
+                        : conversation.title}
                     </CardTitle>
                     <p className="text-xs text-muted-foreground">
                       {conversation.createdAt.toUTCString().replace("GMT", "")}
