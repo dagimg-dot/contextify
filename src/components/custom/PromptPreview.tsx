@@ -3,18 +3,20 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import React from "react";
 
 interface PromptPreviewProps {
   children: React.ReactNode;
   finalPrompt: string;
   isPreviewing: boolean;
+  selectedText: string;
+  clearInput: () => void;
 }
 
 const PromptPreview = ({
   children,
   finalPrompt,
   isPreviewing,
+  selectedText,
 }: PromptPreviewProps) => {
   return (
     <Popover open={isPreviewing}>
@@ -25,6 +27,9 @@ const PromptPreview = ({
         <div className="space-y-2">
           <h4 className="font-medium leading-none">Preview</h4>
           <p className="text-sm text-muted-foreground">
+            Selected Word: {selectedText}
+          </p>
+          <p className="text-sm text-muted-foreground">
             Here's how your input will be transformed into a prompt:
           </p>
           <div className="border p-2 rounded-md">
@@ -32,6 +37,18 @@ const PromptPreview = ({
               {finalPrompt == "" ? "Write something..." : finalPrompt}
             </p>
           </div>
+          {/* <div className="flex justify-between">
+            <Button
+              size="sm"
+              disabled={selectedText === ""}
+              onClick={chooseWord}
+            >
+              Choose Word
+            </Button>
+            <Button variant="destructive" size="sm" onClick={clearInput}>
+              Clear
+            </Button>
+          </div> */}
         </div>
       </PopoverContent>
     </Popover>

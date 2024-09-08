@@ -15,15 +15,20 @@ const cleanInput = (input: string, word: string) => {
   return input.replace(`*${word}*`, word).trim();
 };
 
-export const mergeInput = async (input: string) => {
+export const mergeInput = async (input: string, choosenWord?: string) => {
   const currentPrompt = await db.prompts.where("isCurrent").equals(1).first();
 
   if (!currentPrompt) {
     return input;
   }
 
-  const word = extractWord(input);
-  const cleanedInput = cleanInput(input, word);
+  let word = extractWord(input);
+
+  if (choosenWord !== "" && choosenWord !== undefined) {
+    word = choosenWord;
+  }
+
+  const cleanedInput = cleanInput(input, word);23
   const finalPrompt = currentPrompt.content
     .replace("[insert new word]", word)
     .replace("[insert sentence]", cleanedInput);
