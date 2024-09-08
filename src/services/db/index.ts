@@ -36,11 +36,18 @@ interface Prompt {
   isCurrent: 0 | 1;
 }
 
+interface Settings {
+  id?: number;
+  enctyptedKey: ArrayBuffer;
+  iv: Uint8Array;
+}
+
 class ContextifyDB extends Dexie {
   conversations!: Table<Conversation, number>;
   messages!: Table<Message, number>;
   dictionaryEntries!: Table<DictionaryEntry, string>;
   prompts!: Table<Prompt, number>;
+  settings!: Table<Settings, number>;
 
   constructor() {
     super("ContextifyDB");
@@ -50,6 +57,7 @@ class ContextifyDB extends Dexie {
       dictionaryEntries: "word, lastQueried",
       prompts:
         "++id, &name, &content, createdAt, updatedAt, isDefault, isCurrent",
+      settings: "++id, enctyptedKey",
     });
   }
 }
@@ -105,5 +113,5 @@ const seedDefaultConversation = async () => {
   }
 };
 
-export type { Conversation, Message, DictionaryEntry, Prompt };
+export type { Conversation, Message, DictionaryEntry, Prompt, Settings };
 export { db, seedDefaultPrompt, seedDefaultConversation };

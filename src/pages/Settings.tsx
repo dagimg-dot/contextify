@@ -1,15 +1,12 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft } from "lucide-react";
 import { ThemeToggle } from "@/components/custom/ThemeToggle";
 import Prompts from "@/components/custom/Prompts";
+import GeneralSettings from "@/components/custom/GeneralSettings";
 
 export default function SettingsPage() {
-  const [apiKey, setApiKey] = useState("");
   const navigate = useNavigate();
 
   return (
@@ -23,38 +20,13 @@ export default function SettingsPage() {
         <ThemeToggle />
       </header>
       <main className="flex-1 overflow-hidden p-4">
-        <Tabs defaultValue="api" className="w-full">
+        <Tabs defaultValue="general" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="api">API Key</TabsTrigger>
+            <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="prompts">Prompts</TabsTrigger>
           </TabsList>
-          <TabsContent value="api">
-            <Card>
-              <CardHeader>
-                <CardTitle>Gemini API Key</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col gap-4 text-center">
-                <Input
-                  type="password"
-                  placeholder="Enter your API key"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                />
-                <Button
-                  className="w-full"
-                  onClick={() => alert("API key saved!")}
-                >
-                  Save API Key
-                </Button>
-                <a
-                  href="https://aistudio.google.com/app/apikey"
-                  target="_blank"
-                  className="text-sm text-blue-600"
-                >
-                  Don't have an API key? Get one here!
-                </a>
-              </CardContent>
-            </Card>
+          <TabsContent value="general">
+            <GeneralSettings />
           </TabsContent>
           <TabsContent value="prompts">
             <Prompts />
