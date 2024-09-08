@@ -34,7 +34,8 @@ const HistoryDrawer: React.FC<HistoryDrawerProps> = ({ onShowGuide }) => {
   const [searchHistory, setSearchHistory] = useState("");
   const [conversationToDelete, setConversationToDelete] =
     useState<Conversation | null>(null);
-  const { currentConversationId, setCurrentConversationId } = useGlobalStore();
+  const { currentConversationId, setCurrentConversationId, defaultKey } =
+    useGlobalStore();
 
   const conversations = useLiveQuery(() =>
     db.conversations.orderBy("updatedAt").reverse().toArray()
@@ -45,6 +46,13 @@ const HistoryDrawer: React.FC<HistoryDrawerProps> = ({ onShowGuide }) => {
   );
 
   const createNewConversation = async () => {
+    const conversationCount = await db.conversations.count();
+    if (conversationCount > 3 && defaultKey) {
+      toast.error(
+        "I see you are liking this app. Please set your API key in the settings, you are using mine! 🙂"
+      );
+    }
+
     const newConversationId = await db.conversations.add({
       title: "New Conversation",
       createdAt: new Date(),

@@ -5,6 +5,7 @@ const initialState: GlobalState = {
   currentStreamingContent: null,
   isStreaming: false,
   isLoading: false,
+  defaultKey: false,
   currentConversationId: null,
   setIsLoading: () => {},
   setCurrentStreamingContent: () => {},
