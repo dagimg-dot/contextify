@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send } from "lucide-react";
+import { Eye, Send } from "lucide-react";
 import { db } from "@/services/db";
 import useGlobalStore from "@/store";
 import { toast } from "sonner";
@@ -9,12 +9,13 @@ import { mergeInput } from "@/utils/inputMerger";
 import { getAIResponse } from "@/services/api";
 import { useLiveQuery } from "dexie-react-hooks";
 import PromptPreview from "./PromptPreview";
+import useTextSelection from "@/hooks/useSelection";
 
 const InputArea = () => {
   const [input, setInput] = useState("");
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [finalPrompt, setFinalPrompt] = useState("");
-  // const [isLoading, setIsLoading] = useState(false);
+  const selectedText = useTextSelection();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const {
     currentConversationId: conversationId,
@@ -41,39 +42,14 @@ const InputArea = () => {
     adjustHeight();
     const getFinalPrompt = async () => {
       if (input.trim()) {
-        const merged = await mergeInput(input);
+        const merged = await mergeInput(input, selectedText);
         setFinalPrompt(merged);
       } else {
         setFinalPrompt("");
       }
     };
     getFinalPrompt();
-  }, [input]);
-
-  useEffect(() => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const handleFocus = () => {
-      setIsPreviewing(true);
-    };
-
-    const handleBlur = () => {
-      setTimeout(() => {
-        if (!textarea.contains(document.activeElement)) {
-          setIsPreviewing(false);
-        }
-      }, 0);
-    };
-
-    textarea.addEventListener("focus", handleFocus);
-    textarea.addEventListener("blur", handleBlur);
-
-    return () => {
-      textarea.removeEventListener("focus", handleFocus);
-      textarea.removeEventListener("blur", handleBlur);
-    };
-  }, []);
+  }, [input, selectedText]);
 
   const updateConversationTitle = useCallback(
     async (userMessage: string) => {
@@ -95,6 +71,10 @@ const InputArea = () => {
     },
     [conversationId]
   );
+
+  const handlePreview = useCallback(() => {
+    setIsPreviewing((prev) => !prev);
+  }, []);
 
   const handleSend = useCallback(async () => {
     if (input.trim()) {
@@ -137,7 +117,12 @@ const InputArea = () => {
   return (
     <footer className="p-4 border-t">
       <div className="relative flex items-center">
-        <PromptPreview finalPrompt={finalPrompt} isPreviewing={isPreviewing}>
+        <PromptPreview
+          finalPrompt={finalPrompt}
+          isPreviewing={isPreviewing}
+          clearInput={() => setInput("")}
+          selectedText={selectedText}
+        >
           <Textarea
             ref={textareaRef}
             placeholder={
@@ -157,6 +142,14 @@ const InputArea = () => {
           />
         </PromptPreview>
         <div className="absolute right-2 bottom-2 flex space-x-2">
+          <Button
+            size="icon"
+            disabled={isLoading || isStreaming || input.trim() === ""}
+            onClick={handlePreview}
+          >
+            <Eye className="w-4 h-4" />
+            <span className="sr-only">Preview</span>
+          </Button>
           <Button
             onClick={handleSend}
             size="icon"
