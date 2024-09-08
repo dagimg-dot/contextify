@@ -15,7 +15,7 @@ export function useStreaming(
     let index = -1;
 
     streamIntervalRef.current = setInterval(() => {
-      if (index < content.length) {
+      if (index < content.length - 1) {
         setStreamedContent((prev) => prev + content[index]);
         index++;
       } else {
