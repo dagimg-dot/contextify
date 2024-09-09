@@ -138,7 +138,7 @@ const InputArea = () => {
                 handleSend();
               }
             }}
-            className="flex-1 min-h-[10px] h-[40px] max-h-60 transition-all duration-200 overflow-hidden pr-12"
+            className="flex-1 min-h-[10px] h-[40px] max-h-60 transition-all duration-200 pr-12"
           />
         </PromptPreview>
         <div className="absolute right-2 bottom-2 flex space-x-2">
