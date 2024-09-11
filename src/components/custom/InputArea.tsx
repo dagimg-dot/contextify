@@ -19,6 +19,7 @@ const InputArea = () => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const {
     currentConversationId: conversationId,
+    setCurrentConversationId,
     isStreaming,
     setCurrentStreamingContent,
     setIsStreaming,
@@ -79,7 +80,14 @@ const InputArea = () => {
   const handleSend = useCallback(async () => {
     if (input.trim()) {
       if (!conversationId) {
-        toast.error("Please select a conversation to send a message");
+        const conversations = await db.conversations.toArray();
+        if (conversations.length > 0) {
+          setCurrentConversationId(conversations[conversations.length - 1].id!);
+          return;
+        }
+        toast.error(
+          "Please select or create  a conversation to send a message"
+        );
         return;
       }
 
@@ -108,6 +116,7 @@ const InputArea = () => {
   }, [
     input,
     conversationId,
+    setCurrentConversationId,
     finalPrompt,
     setCurrentStreamingContent,
     setIsStreaming,
