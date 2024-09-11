@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { mergeInput } from "@/utils/inputMerger";
 import { getAIResponse } from "@/services/api";
 import { useLiveQuery } from "dexie-react-hooks";
-import PromptPreview from "./PromptPreview";
+import PromptPreview from "@/components/custom/PromptPreview";
 import useTextSelection from "@/hooks/useSelection";
 
 const InputArea = () => {
@@ -111,6 +111,7 @@ const InputArea = () => {
     finalPrompt,
     setCurrentStreamingContent,
     setIsStreaming,
+    setIsLoading,
     updateConversationTitle,
   ]);
 
