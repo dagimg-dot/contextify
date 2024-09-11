@@ -3,11 +3,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useEffect } from "react";
 
 interface PromptPreviewProps {
   children: React.ReactNode;
   finalPrompt: string;
   isPreviewing: boolean;
+  setIsPreviewing: (isPreviewing: boolean) => void;
+  textAreaRef: React.RefObject<HTMLTextAreaElement>;
   selectedText: string;
   clearInput: () => void;
 }
@@ -17,13 +20,45 @@ const PromptPreview = ({
   finalPrompt,
   isPreviewing,
   selectedText,
+  setIsPreviewing,
+  textAreaRef,
 }: PromptPreviewProps) => {
+  useEffect(() => {
+    let popOverEl: HTMLDivElement;
+    const textAreaEl = textAreaRef.current;
+
+    const handlePreview = (event: MouseEvent) => {
+      popOverEl = document.querySelector(
+        "[data-radix-popper-content-wrapper]"
+      )!;
+
+      if (isPreviewing && !popOverEl?.contains(event.target as Node)) {
+        setIsPreviewing(false);
+      }
+
+      if (textAreaEl?.contains(event.target as Node)) {
+        setIsPreviewing(true);
+
+        // Use a slight delay to allow the popover to open before focusing the textarea
+        setTimeout(() => {
+          textAreaEl.focus();
+        }, 100);
+      }
+    };
+
+    document.addEventListener("click", handlePreview);
+
+    return () => {
+      document.removeEventListener("click", handlePreview);
+    };
+  }, [setIsPreviewing, textAreaRef, isPreviewing]);
+
   return (
     <Popover open={isPreviewing}>
       <PopoverTrigger asChild>
         <div className="w-full">{children}</div>
       </PopoverTrigger>
-      <PopoverContent className="w-80 mb-4" side="top">
+      <PopoverContent className="w-80 mb-4 pop" side="top">
         <div className="space-y-2">
           <h4 className="font-medium leading-none">Preview</h4>
           <p className="text-sm text-muted-foreground">

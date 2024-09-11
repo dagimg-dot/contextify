@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Eye, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { db } from "@/services/db";
 import useGlobalStore from "@/store";
 import { toast } from "sonner";
@@ -72,10 +72,6 @@ const InputArea = () => {
     [conversationId]
   );
 
-  const handlePreview = useCallback(() => {
-    setIsPreviewing((prev) => !prev);
-  }, []);
-
   const handleSend = useCallback(async () => {
     if (input.trim()) {
       if (!conversationId) {
@@ -123,6 +119,8 @@ const InputArea = () => {
           isPreviewing={isPreviewing}
           clearInput={() => setInput("")}
           selectedText={selectedText}
+          setIsPreviewing={setIsPreviewing}
+          textAreaRef={textareaRef}
         >
           <Textarea
             ref={textareaRef}
@@ -143,14 +141,6 @@ const InputArea = () => {
           />
         </PromptPreview>
         <div className="absolute right-2 bottom-2 flex space-x-2">
-          <Button
-            size="icon"
-            disabled={isLoading || isStreaming || input.trim() === ""}
-            onClick={handlePreview}
-          >
-            <Eye className="w-4 h-4" />
-            <span className="sr-only">Preview</span>
-          </Button>
           <Button
             onClick={handleSend}
             size="icon"
