@@ -37,7 +37,7 @@ const PromptPreview = ({
 }: PromptPreviewProps) => {
   const prompts = useLiveQuery(() => db.prompts.toArray());
   const choosenPrompt = useLiveQuery(() =>
-    db.prompts.where("isCurrent").equals(1).first()
+    db.prompts.where("isCurrent").equals(1).first() ?? []
   );
 
   useEffect(() => {
