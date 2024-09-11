@@ -7,9 +7,11 @@ import { db, type Prompt } from "@/services/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { toast } from "sonner";
 import { useState } from "react";
+import { Input } from "@/components/ui/input";
 
 const Prompts = () => {
   const [customPrompt, setCustomPrompt] = useState("");
+  const [promptName, setPromptName] = useState("");
   const prompts = useLiveQuery(() => db.prompts.toArray());
   const currentPrompt = useLiveQuery(() =>
     db.prompts.where("isCurrent").equals(1).first()
@@ -21,7 +23,7 @@ const Prompts = () => {
         await db.transaction("rw", db.prompts, async () => {
           const newPrompt = {
             content: customPrompt.trim(),
-            name: `Custom Prompt ${new Date().toLocaleString()}`,
+            name: promptName.trim(),
             createdAt: new Date(),
             updatedAt: new Date(),
             isDefault: false,
@@ -78,6 +80,12 @@ const Prompts = () => {
         <CardTitle>Custom Prompts</CardTitle>
       </CardHeader>
       <CardContent>
+        <Input
+          placeholder="Enter name for your prompt"
+          value={promptName}
+          onChange={(e) => setPromptName(e.target.value)}
+          className="mb-4"
+        />
         <Textarea
           placeholder="Enter your custom prompt..."
           value={customPrompt}
@@ -87,7 +95,7 @@ const Prompts = () => {
         <Button
           className="mt-4 w-full"
           onClick={savePrompt}
-          disabled={customPrompt.trim() === ""}
+          disabled={customPrompt.trim() === "" || promptName.trim() === ""}
         >
           Save Prompt
         </Button>
@@ -120,6 +128,7 @@ const Prompts = () => {
                 }`}
               >
                 <CardContent className="p-2">
+                  <p className="text-sm italic font-bold pb-2">{prompt.name}</p>
                   <p className="text-sm">{prompt.content}</p>
                   <div className="flex justify-between items-center mt-2">
                     <Button
