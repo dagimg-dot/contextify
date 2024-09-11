@@ -2,6 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes dots {
+  0% {
+    content: ".";
+  }
+  20% {
+    content: ". .";
+  }
+  40% {
+    content: ". . .";
+  }
+  60% {
+    content: ". . . .";
+  }
+  80% {
+    content: ". . . . .";
+  }
+  100% {
+    content: ". . . . . .";
+  }
+}
+
+.dot-animation::after {
+  content: "";
+  animation: dots 2s steps(5, end) infinite;
+}
+
 ::-webkit-scrollbar {
   width: 5px;
 }

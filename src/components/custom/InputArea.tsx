@@ -31,6 +31,10 @@ const InputArea = () => {
     [conversationId]
   );
 
+  const currentPrompt = useLiveQuery(() =>
+    db.prompts.where("isCurrent").equals(1).first()
+  );
+
   const adjustHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
@@ -49,7 +53,7 @@ const InputArea = () => {
       }
     };
     getFinalPrompt();
-  }, [input, selectedText]);
+  }, [input, selectedText, currentPrompt]);
 
   const updateConversationTitle = useCallback(
     async (userMessage: string) => {
