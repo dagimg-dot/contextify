@@ -36,8 +36,8 @@ const PromptPreview = ({
   textAreaRef,
 }: PromptPreviewProps) => {
   const prompts = useLiveQuery(() => db.prompts.toArray());
-  const choosenPrompt = useLiveQuery(() =>
-    db.prompts.where("isCurrent").equals(1).first() ?? []
+  const choosenPrompt = useLiveQuery(
+    () => db.prompts.where("isCurrent").equals(1).first() ?? []
   );
 
   useEffect(() => {
@@ -125,7 +125,7 @@ const PromptPreview = ({
           <div className="border p-2 rounded-md">
             <p className="text-sm">
               {finalPrompt == "" ? (
-                <span className="dot-animation"></span>
+                <span className="dot-animation">Write something</span>
               ) : (
                 finalPrompt
               )}
