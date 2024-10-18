@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import Drawer from "@/components/custom/Drawer";
 import { ThemeToggle } from "@/components/custom/ThemeToggle";
 import { useNavigate } from "react-router-dom";
+import { useIsMobile } from "@/store";
 
 interface HeaderProps {
   onShowGuide: () => void;
@@ -10,6 +11,7 @@ interface HeaderProps {
 
 const Header = ({ onShowGuide }: HeaderProps) => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   return (
     <header className="flex items-center justify-between p-4 border-b">
@@ -27,7 +29,7 @@ const Header = ({ onShowGuide }: HeaderProps) => {
           <Settings className="w-5 h-5" />
           <span className="sr-only">Settings</span>
         </Button>
-        <Drawer onShowGuide={onShowGuide} />
+        {isMobile && <Drawer onShowGuide={onShowGuide} />}
       </div>
     </header>
   );

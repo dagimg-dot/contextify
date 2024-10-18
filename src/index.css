@@ -42,6 +42,24 @@
   border-radius: 10px;
 }
 
+/* Add this new rule for Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: beige transparent;
+}
+
+@media (max-width: 790px) {
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+}
+
+
 @layer base {
   :root {
     --background: 0 0% 100%;

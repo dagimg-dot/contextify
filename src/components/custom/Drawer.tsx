@@ -14,7 +14,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { HelpCircle, Plus, ChevronRight, Trash2, History } from "lucide-react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, Conversation } from "@/services/db";
-import useGlobalStore from "@/store";
+import useGlobalStore, { useIsMobile } from "@/store";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -31,6 +31,7 @@ interface HistoryDrawerProps {
 
 const HistoryDrawer: React.FC<HistoryDrawerProps> = ({ onShowGuide }) => {
   const [openSheet, setOpenSheet] = useState(false);
+  const isMobile = useIsMobile();
   const [searchHistory, setSearchHistory] = useState("");
   const [conversationToDelete, setConversationToDelete] =
     useState<Conversation | null>(null);
@@ -97,94 +98,147 @@ const HistoryDrawer: React.FC<HistoryDrawerProps> = ({ onShowGuide }) => {
     }
   };
 
-  return (
+  const renderContent = () => (
     <>
-      <Sheet open={openSheet} onOpenChange={setOpenSheet}>
-        <SheetTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setOpenSheet(true)}
+      <div className="flex flex-col space-y-4">
+        <Button onClick={createNewConversation} className="w-full">
+          <Plus className="w-4 h-4 mr-2" /> New Conversation
+        </Button>
+        <Input
+          type="text"
+          placeholder="Search conversations..."
+          value={searchHistory}
+          onChange={(e) => setSearchHistory(e.target.value)}
+          className="w-full"
+        />
+      </div>
+      <ScrollArea className="h-[calc(100vh-12rem)] mt-4">
+        {filteredConversations?.map((conversation) => (
+          <Card
+            key={conversation.id}
+            className={`mb-2 cursor-pointer hover:bg-accent ${
+              conversation.id === currentConversationId
+                ? "border-primary"
+                : ""
+            }`}
           >
-            <History className="w-5 h-5" />
-            <span className="sr-only">History</span>
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="right">
-          <SheetHeader className="flex flex-row items-center justify-between space-y-0 mb-4">
-            <SheetTitle>History</SheetTitle>
-            <div>
+            <CardHeader className="py-2 flex flex-row items-center justify-between">
+              <div
+                onClick={() => selectConversation(conversation)}
+                className="flex-1"
+              >
+                <CardTitle className="text-sm">
+                  {conversation.title.length > 20
+                    ? conversation.title.slice(0, 20).concat("...")
+                    : conversation.title}
+                </CardTitle>
+                <p className="text-xs text-muted-foreground">
+                  {conversation.createdAt.toUTCString().replace("GMT", "")}
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setConversationToDelete(conversation);
+                }}
+              >
+                <Trash2 className="w-4 h-4" />
+                <span className="sr-only">Delete conversation</span>
+              </Button>
+            </CardHeader>
+          </Card>
+        ))}
+      </ScrollArea>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <>
+        <Sheet open={openSheet} onOpenChange={setOpenSheet}>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setOpenSheet(true)}
+            >
+              <History className="w-5 h-5" />
+              <span className="sr-only">History</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right">
+            <SheetHeader className="flex flex-row items-center justify-between space-y-0 mb-4">
+              <SheetTitle>History</SheetTitle>
+              <div>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={onShowGuide}
+                  className="mr-2"
+                >
+                  <HelpCircle className="w-5 h-5" />
+                  <span className="sr-only">Help</span>
+                </Button>
+                <SheetClose asChild>
+                  <Button variant="outline" size="icon">
+                    <ChevronRight className="w-5 h-5" />
+                    <span className="sr-only">Close</span>
+                  </Button>
+                </SheetClose>
+              </div>
+            </SheetHeader>
+            {renderContent()}
+          </SheetContent>
+        </Sheet>
+
+        <Dialog
+          open={!!conversationToDelete}
+          onOpenChange={(open) => !open && setConversationToDelete(null)}
+        >
+          <DialogContent className="max-w-[370px] rounded-md">
+            <DialogHeader>
+              <DialogTitle>
+                Are you sure you want to delete this conversation?
+              </DialogTitle>
+              <DialogDescription>
+                This action cannot be undone. This will permanently delete the
+                conversation and all its messages.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex flex-col gap-3">
+              <Button variant="destructive" onClick={handleDeleteConversation}>
+                Delete
+              </Button>
               <Button
                 variant="outline"
-                size="icon"
-                onClick={onShowGuide}
-                className="mr-2"
+                onClick={() => setConversationToDelete(null)}
               >
-                <HelpCircle className="w-5 h-5" />
-                <span className="sr-only">Help</span>
+                Cancel
               </Button>
-              <SheetClose asChild>
-                <Button variant="outline" size="icon">
-                  <ChevronRight className="w-5 h-5" />
-                  <span className="sr-only">Close</span>
-                </Button>
-              </SheetClose>
-            </div>
-          </SheetHeader>
-          <div className="flex flex-col space-y-4">
-            <Button onClick={createNewConversation} className="w-full">
-              <Plus className="w-4 h-4 mr-2" /> New Conversation
-            </Button>
-            <Input
-              type="text"
-              placeholder="Search conversations..."
-              value={searchHistory}
-              onChange={(e) => setSearchHistory(e.target.value)}
-              className="w-full"
-            />
-          </div>
-          <ScrollArea className="h-[calc(100vh-12rem)] mt-4">
-            {filteredConversations?.map((conversation) => (
-              <Card
-                key={conversation.id}
-                className={`mb-2 cursor-pointer hover:bg-accent ${
-                  conversation.id === currentConversationId
-                    ? "border-primary"
-                    : ""
-                }`}
-              >
-                <CardHeader className="py-2 flex flex-row items-center justify-between">
-                  <div
-                    onClick={() => selectConversation(conversation)}
-                    className="flex-1"
-                  >
-                    <CardTitle className="text-sm">
-                      {conversation.title.length > 20
-                        ? conversation.title.slice(0, 20).concat("...")
-                        : conversation.title}
-                    </CardTitle>
-                    <p className="text-xs text-muted-foreground">
-                      {conversation.createdAt.toUTCString().replace("GMT", "")}
-                    </p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setConversationToDelete(conversation);
-                    }}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    <span className="sr-only">Delete conversation</span>
-                  </Button>
-                </CardHeader>
-              </Card>
-            ))}
-          </ScrollArea>
-        </SheetContent>
-      </Sheet>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  }
 
+  return (
+    <div className="w-72 p-4 border-r">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">History</h2>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={onShowGuide}
+        >
+          <HelpCircle className="w-5 h-5" />
+          <span className="sr-only">Help</span>
+        </Button>
+      </div>
+      {renderContent()}
+      
       <Dialog
         open={!!conversationToDelete}
         onOpenChange={(open) => !open && setConversationToDelete(null)}
@@ -212,7 +266,7 @@ const HistoryDrawer: React.FC<HistoryDrawerProps> = ({ onShowGuide }) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 };
 

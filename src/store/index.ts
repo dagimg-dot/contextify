@@ -1,5 +1,6 @@
 import { GlobalState } from "@/types/types";
 import { create } from "zustand";
+import { useMediaQuery } from "react-responsive";
 
 const initialState: GlobalState = {
   currentStreamingContent: null,
@@ -24,5 +25,7 @@ const useGlobalStore = create<GlobalState>()((set) => ({
   },
   setIsLoading: (isLoading: boolean) => set({ isLoading }),
 }));
+
+export const useIsMobile = () => useMediaQuery({ maxWidth: 768 });
 
 export default useGlobalStore;
