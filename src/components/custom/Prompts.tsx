@@ -18,6 +18,11 @@ const Prompts = () => {
   );
 
   const savePrompt = async () => {
+    const underDevelopment = true;
+    if (underDevelopment) {
+      toast.error("Custom prompts are under development");
+      return;
+    }
     if (customPrompt.trim()) {
       try {
         await db.transaction("rw", db.prompts, async () => {
