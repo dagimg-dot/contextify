@@ -76,7 +76,7 @@ const GeneralSettings = () => {
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
         />
-        <Button className="w-full" onClick={saveApiKey} disabled={isKeySaved}>
+        <Button className="w-full" onClick={saveApiKey} disabled={isKeySaved || apiKey == ""}>
           Save API Key
         </Button>
         {isKeySaved && (
