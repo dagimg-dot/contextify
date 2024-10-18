@@ -1,5 +1,4 @@
 import { useRef, useEffect } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import Message from "@/components/custom/Message";
 import StreamingMessage from "@/components/custom/StreamingMessage";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -58,8 +57,7 @@ const Chat = () => {
   };
 
   return (
-    <main className="flex-1 overflow-hidden">
-      <ScrollArea className="h-full p-4" ref={scrollAreaRef}>
+    <main className="flex-1 overflow-hidden mt-3">
         <Message message={defaultMessage} />
         {messages?.map((message, index) => (
           <Message key={index} message={message} />
@@ -72,7 +70,6 @@ const Chat = () => {
             onComplete={handleStreamingComplete}
           />
         )}
-      </ScrollArea>
     </main>
   );
 };

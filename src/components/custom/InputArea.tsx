@@ -125,7 +125,7 @@ const InputArea = () => {
   ]);
 
   return (
-    <footer className="p-4 border-t">
+    <footer className="py-4">
       <div className="relative flex items-center">
         <PromptPreview
           finalPrompt={finalPrompt}

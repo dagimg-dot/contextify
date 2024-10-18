@@ -26,8 +26,16 @@ export default function Home() {
   return (
     <div className="flex flex-col h-dvh bg-background">
       <Header onShowGuide={() => setShowGuide(true)} />
-      <Chat />
-      <InputArea />
+      <div className="flex-1 overflow-y-auto flex justify-center relative">
+        <div className="w-full max-w-3xl flex flex-col h-full">
+          <div className="flex-1">
+            <Chat />
+          </div>
+          <div className="sticky bottom-0 bg-background">
+            <InputArea />
+          </div>
+        </div>
+      </div>
       <UserGuide open={showGuide} onOpenChange={setShowGuide} />
     </div>
   );

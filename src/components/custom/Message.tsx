@@ -32,7 +32,7 @@ const Message = React.memo(({ message }: MessageProps) => {
       </Card>
       {isHovered && (
         <div className="flex flex-col gap-1 mb-2">
-          {message.type === "user" && <RefreshCcw size="18" />}
+          {message.type === "user" && <RefreshCcw cursor={"pointer"} size="18" />}
           {message.type === "ai" && (
             <button onClick={() => copyToClipboard(message.content)}>
               {copySuccess ? (
