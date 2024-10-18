@@ -42,19 +42,23 @@ const GeneralSettings = () => {
       }
 
       setIsKeySaved(true);
-      toast.success("API key saved successfully");
+      toast.success(
+        "API key saved successfully, please refresh the page to apply changes"
+      );
+      window.location.reload();
     } catch (error) {
       toast.error("Failed to save API key");
     }
   };
-
+  
   const resetApiKey = async () => {
     try {
       await db.settings.delete(keyId!);
       setApiKey("");
       setIsKeySaved(false);
-
-      toast.success("API key reset successfully");
+      
+      toast.success("API key reset successfully, please refresh the page to apply changes");
+      window.location.reload();
     } catch (error) {
       toast.error("Failed to reset API key");
     }

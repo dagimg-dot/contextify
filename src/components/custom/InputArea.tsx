@@ -108,7 +108,13 @@ const InputArea = () => {
         setIsStreaming(true);
         setCurrentStreamingContent(response);
       } catch (error) {
-        toast.error("Error: " + (error as Error).message);
+        if ((error as Error).message.includes("API key not valid")) {
+          toast.error(
+            "The API key is not valid. Please set a valid API key in the settings."
+          );
+        } else {
+          toast.error("Error: " + (error as Error).message);
+        }
       } finally {
         setIsLoading(false);
       }
