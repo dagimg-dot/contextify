@@ -34,6 +34,7 @@ const Prompts = () => {
 
           if (newPromptId) {
             selectPrompt(newPrompt);
+            setPromptName("");
             setCustomPrompt("");
 
             toast.success("The prompt has been successfully saved.");
@@ -101,7 +102,7 @@ const Prompts = () => {
         </Button>
         <div className="mt-4">
           <h3 className="font-semibold mb-2">Saved Prompts:</h3>
-          <ScrollArea className="h-auto">
+          <ScrollArea className="h-[300px]">
             {prompts?.length === 0 && (
               <Card className="mb-2">
                 <CardContent className="p-2">
