@@ -77,6 +77,21 @@ const InputArea = () => {
     [conversationId]
   );
 
+  const isNewConversation = useCallback(async () => {
+    if (conversationId) {
+      return (
+        (
+          await db.messages
+            .where("conversationId")
+            .equals(conversationId!)
+            .toArray()
+        ).length == 0
+      );
+    }
+
+    return false;
+  }, [conversationId]);
+
   const handleSend = useCallback(async () => {
     if (input.trim()) {
       if (!conversationId) {
@@ -92,7 +107,8 @@ const InputArea = () => {
       }
 
       const userMessage = input.trim();
-      updateConversationTitle(userMessage);
+      const isNewConv = await isNewConversation();
+      await updateConversationTitle(userMessage);
       await db.messages.add({
         conversationId,
         content: userMessage,
@@ -104,7 +120,8 @@ const InputArea = () => {
       setIsPreviewing(false);
 
       try {
-        const response = await getAIResponse(finalPrompt);
+        console.log("isNewConv", isNewConv);
+        const response = await getAIResponse(finalPrompt, isNewConv);
         setIsStreaming(true);
         setCurrentStreamingContent(response);
       } catch (error) {
@@ -128,6 +145,7 @@ const InputArea = () => {
     setIsStreaming,
     setIsLoading,
     updateConversationTitle,
+    isNewConversation,
   ]);
 
   return (

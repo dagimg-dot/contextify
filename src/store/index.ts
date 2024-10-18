@@ -7,6 +7,7 @@ const initialState: GlobalState = {
   isStreaming: false,
   isLoading: false,
   defaultKey: false,
+  chatSession: null,
   currentConversationId: null,
   setIsLoading: () => {},
   setCurrentStreamingContent: () => {},
