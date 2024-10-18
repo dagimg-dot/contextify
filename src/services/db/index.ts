@@ -1,4 +1,5 @@
 import useGlobalStore from "@/store";
+import { extractAndPersist } from "@/utils/placeholderExtractor";
 import Dexie, { type Table } from "dexie";
 import { toast } from "sonner";
 
@@ -30,6 +31,7 @@ interface Prompt {
   id?: number;
   content: string;
   name: string;
+  placeholders?: string[];
   createdAt: Date;
   updatedAt: Date;
   isDefault: boolean;
@@ -56,7 +58,7 @@ class ContextifyDB extends Dexie {
       messages: "++id, conversationId, type, timestamp, content",
       dictionaryEntries: "word, lastQueried",
       prompts:
-        "++id, &name, &content, createdAt, updatedAt, isDefault, isCurrent",
+        "++id, &name, &content, createdAt, placeholders, updatedAt, isDefault, isCurrent",
       settings: "++id, enctyptedKey",
     });
   }
@@ -66,23 +68,37 @@ const db = new ContextifyDB();
 
 const seedDefaultPrompt = async () => {
   try {
-    const existingDefaultPrompt = await db.prompts
+    const existingDefaultPrompts = await db.prompts
       .where("isDefault")
-      .equals("true")
-      .first();
+      .equals(1)
+      .toArray();
 
-    if (!existingDefaultPrompt) {
-      const defaultPrompt = {
-        content:
-          "Can you explain the meaning of the word '[insert new word]' in this sentence: '[insert sentence]'? Please summarize the explanation in one paragraph.",
-        name: "Default Prompt",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        isDefault: true,
-        isCurrent: 1 as const,
-      };
-      await db.prompts.add(defaultPrompt);
+    if (existingDefaultPrompts.length > 0) {
+      return;
     }
+
+    const defaultPrompt1 = {
+      content:
+        "Can you explain the meaning of the word '[insert_newword]' in this sentence: '[insert_sentence]'? Please summarize the explanation in one paragraph and also give me 2 simpler examples to solidify my understanding",
+      name: "Default",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isDefault: true,
+      isCurrent: 1 as const,
+    };
+    const defaultPrompt2 = {
+      content: "",
+      name: "Blank",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isDefault: true,
+      isCurrent: 0 as const,
+    };
+
+    const prompt1 = extractAndPersist(defaultPrompt1);
+    const prompt2 = extractAndPersist(defaultPrompt2);
+
+    await db.prompts.bulkAdd([prompt1, prompt2]);
   } catch (error) {
     if (!(error instanceof Dexie.ConstraintError)) {
       toast.error("Failed to add default prompt");
