@@ -26,6 +26,6 @@ const useGlobalStore = create<GlobalState>()((set) => ({
   setIsLoading: (isLoading: boolean) => set({ isLoading }),
 }));
 
-export const useIsMobile = () => useMediaQuery({ maxWidth: 768 });
+export const useIsMobile = () => useMediaQuery({ maxWidth: 850 });
 
 export default useGlobalStore;

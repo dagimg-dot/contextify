@@ -101,7 +101,7 @@ const Prompts = () => {
         </Button>
         <div className="mt-4">
           <h3 className="font-semibold mb-2">Saved Prompts:</h3>
-          <ScrollArea className="h-[200px]">
+          <ScrollArea className="h-auto">
             {prompts?.length === 0 && (
               <Card className="mb-2">
                 <CardContent className="p-2">

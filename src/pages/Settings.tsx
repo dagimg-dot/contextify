@@ -10,8 +10,8 @@ export default function SettingsPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col h-screen bg-background">
-      <header className="flex items-center justify-between p-4 border-b">
+    <div className="flex flex-col min-h-screen bg-background">
+      <header className="flex items-center justify-between p-4 border-b w-full">
         <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
           <ChevronLeft className="w-5 h-5" />
           <span className="sr-only">Back to main</span>
@@ -19,19 +19,21 @@ export default function SettingsPage() {
         <h1 className="text-xl font-bold">Settings</h1>
         <ThemeToggle />
       </header>
-      <main className="flex-1 overflow-hidden p-4">
-        <Tabs defaultValue="general" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="prompts">Prompts</TabsTrigger>
-          </TabsList>
-          <TabsContent value="general">
-            <GeneralSettings />
-          </TabsContent>
-          <TabsContent value="prompts">
-            <Prompts />
-          </TabsContent>
-        </Tabs>
+      <main className="flex-1 overflow-hidden p-4 flex justify-center">
+        <div className="w-full max-w-3xl">
+          <Tabs defaultValue="general" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="general">General</TabsTrigger>
+              <TabsTrigger value="prompts">Prompts</TabsTrigger>
+            </TabsList>
+            <TabsContent value="general">
+              <GeneralSettings />
+            </TabsContent>
+            <TabsContent value="prompts">
+              <Prompts />
+            </TabsContent>
+          </Tabs>
+        </div>
       </main>
     </div>
   );

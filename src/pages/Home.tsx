@@ -35,7 +35,7 @@ export default function Home() {
       <div className="col-start-2 h-18">
         <Header onShowGuide={() => setShowGuide(true)} />
       </div>
-      <div className="col-start-2 row-start-2 overflow-y-auto flex justify-center">
+      <div className="col-start-2 row-start-2 overflow-y-auto flex justify-center px-4">
         <div className="w-full max-w-3xl flex flex-col h-full">
           <div className="flex-1">
             <Chat />
