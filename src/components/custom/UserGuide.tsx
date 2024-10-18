@@ -24,17 +24,24 @@ const UserGuide = ({ open, onOpenChange }: UserGuideProps) => (
       </DialogHeader>
       <ScrollArea>
         <div className="grid gap-4 py-4">
+          <p>1. Enter a sentence in the input field at the bottom.</p>
+          <p>2. Select the word you want to be explained.</p>
           <p>
-            1. Enter a word and its context in the input field at the bottom.
+            3. Once you are sure of your selection in the pop over window, click
+            the send button or press Enter to get an explanation.
           </p>
-          <p>2. Click the send button or press Enter to get an explanation.</p>
           <p>
-            3. View your search history by clicking the menu icon in the top
+            4. You can also select between the two available prompts (
+            <strong>Default</strong> and <strong>Blank</strong>) in the pop over
+            window.
+          </p>
+          <p>
+            5. View your search history by clicking the menu icon in the top
             right.
           </p>
-          <p>4. Customize your API key and prompts in the settings page.</p>
+          <p>6. Customize your API key and prompts in the settings page.</p>
           <p>
-            5. Access this guide anytime by clicking the help icon in the
+            7. Access this guide anytime by clicking the help icon in the
             history drawer.
           </p>
         </div>
